@@ -40,6 +40,7 @@ type
     uri*: string
     headers*: HttpHeaders
     body*: string
+    parts*: seq[string]
     remoteAddress*: string
     server: Server
     clientSocket: SocketHandle

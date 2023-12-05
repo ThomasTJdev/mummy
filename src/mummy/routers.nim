@@ -43,7 +43,7 @@ proc addRoute*(
   while i < parts.len:
     if parts[i] == "**":
       var j = i + 1
-      if j < parts.len and (parts[j] == "*" or parts[j] == "**"):
+      if j < parts.len and ((parts[j] == "*" or parts[j][0] == '@') or parts[j] == "**"):
         raise newException(
           MummyError,
           "Route ** followed by another * or ** is not supported"
@@ -229,7 +229,7 @@ proc toHandler*(router: Router): RequestHandler =
             matchedRoute = false
             break
 
-          if route.parts[i] == "*": # Wildcard
+          if route.parts[i] == "*" or route.parts[i][0] == '@': # Wildcard
             inc i
           elif route.parts[i] == "**": # Multi-part wildcard
             # Do we have a required next literal?
@@ -259,6 +259,7 @@ proc toHandler*(router: Router): RequestHandler =
             inc i
 
         if matchedRoute:
+          request.parts = route.parts
           matchedSomeRoute = true
           if request.httpMethod == route.httpMethod: # We have a winner
             route.handler(request)
